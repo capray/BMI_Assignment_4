@@ -10,4 +10,4 @@ full_xls = pd.ExcelFile('06222016 Staph Array Data.xlsx');
 
 df_plate1 = full_xls.parse(0,skiprows=1);
 
-print(df_plate1)
+print(df_plate1["Sample ID"])
