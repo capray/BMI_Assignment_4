@@ -1,0 +1,7 @@
+surface protein ext	cytoplasmic ext	Exoprotein ext							
+LukE	LukD	LukS-PV	LukF-PV	LukAB(Lab)	LukAB(cc30)				
+Hemolysin gamma A	Hemolysin gamma B	Hemolysin gamma C	HLA-1	HLA -2	HLA	Betatoxin	PNAG		
+SEO	SP	SEG	SEI	SEU	SEN	SEM	SEB		
+PSMalpha2	PSMalpha3	psmalpah4	PSM 4variant						
+Pn CWPS	PC4	PC-12	PC16	Pn PS12	Pn PS23	S.Pyogenese arcA	PLY	Tetanus Toxoid	Glom.extract
+hIgG	SpA domD5-WT	SpA domD5FcNull	hIgA	BSA	HSA	Rabbit IgG	ABA	LDL	
