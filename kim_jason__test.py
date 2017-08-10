@@ -8,6 +8,6 @@ full_xls = pd.ExcelFile('06222016 Staph Array Data.xlsx');
 # for sheet in range(11):
 #     pass;
 
-df_plate1 = full_xls.parse(0,skiprows=1);
+df_plate1 = full_xls.parse(0,skiprows=1);   # df for sheet 1
 
 print(df_plate1)
