@@ -57,7 +57,7 @@ def clean_sample_id_column(df_plate):
 full_xls = pd.ExcelFile('06222016 Staph Array Data.xlsx');
 
 # loop through each sheet
-for sheet_num in range(11):
+for sheet_num in range(2,11):
     # grab corresponding sheet as a dataframe, skipping the first row as it contains meaningless data
     df_plate_dirty = full_xls.parse(sheet_num, skiprows=1);
 
@@ -117,6 +117,8 @@ for sheet_num in range(11):
                 # plot each visit
                 visits = patient_data.groupby("Visit");
                 for visit_name, visit_data in visits:
+                    if visit_name == "None":
+                        visit_name = "V1";
                     # plotting with log axis, colors according to the visit_color dictionary
                     plt.loglog(visit_data["Dilution"], visit_data[plot_col], color=visit_color[visit_name.upper()],
                                marker='o', markerfacecolor='none',
