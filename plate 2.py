@@ -12,10 +12,11 @@ def clean_sample_id_column(df_plate):
     column1_array = [cell[::-1] for cell in column1_array]
 
     # cleaning up data
-    rex = re.compile(r'(?:(?P<Dilution> *[0]+1) *)?(?:(?P<Visit> *[1-3][v|V] *))?(?P<PatientID>[ |[A-Za-z0-9_]+)?|'
-                     r'(?P<Standard> *[^'Standard']+)')
+    # rex = re.compile(r'(?:(?P<Dilution> *[0]+1) *)?(?:(?P<Visit> *[1-3][v|V] *))?(?P<PatientID>[ |[A-Za-z0-9_]+)?|'
+    #                  r'(?P<Standard> *[^'Standard']+)')
+    # outputs = [rex.match(x) for x in column1_array]
+    rex = re.compile(r'(?:(?P<Dilution> *[0]+1) *)?(?:(?P<Visit> *[1-3][v|V] *))?(?P<PatientID>[ |[A-Za-z0-9_]+)')
     outputs = [rex.match(x) for x in column1_array]
-
 
 
     # this takes the named groups from the regular expression above converts everything into a list of dictionaries where
@@ -55,7 +56,7 @@ def clean_sample_id_column(df_plate):
     df_plate.insert(0, 'PatientID', id_list)
     df_plate.insert(1, 'Visit', visit_list)
     df_plate.insert(2, 'Dilution', dilution_list)
-    df_plate.insert(3, 'Standard', standard_list)
+    # df_plate.insert(3, 'Standard', standard_list)
 
     # return new dataframe
     return df_plate;
@@ -90,20 +91,33 @@ plot_columns = ['surface protein ext', 'cytoplasmic ext', 'Exoprotein ext', 'Luk
 visit_color = {"V1": "r", "V2": "b", "V3": "g"};
 
     # group by patient id
-# patient_id = df_plate.groupby("PatientID");
-# for patient_name, patient_data in patient_id:
-#         # making sure patient name is a string
-#     patient_name = str(patient_name);
-#     # create html file
-#     fh = open("Plate " + str(2) + "-" + patient_name + ".html", "w");
-#     html_message = "<table>\n<tr>\n";
-#     figure_num = 1;
-#     # go through each data column to plot
-#     for plot_col in plot_columns:
-#         print("plotting figure " + str(figure_num));
-#         # set figure and width/height
-#         plt.figure(figure_num, figsize=(5, 5));
-#         plt_title = patient_name;
+patient_id = df_plate.groupby("PatientID");
+for patient_name, patient_data in patient_id:
+        # making sure patient name is a string
+    patient_name = str(patient_name);
+    # create html file
+    fh = open("Plate " + str(2) + "-" + patient_name + ".html", "w");
+    html_message = "<table>\n<tr>\n";
+    figure_num = 1;
+    # go through each data column to plot
+    for plot_col in plot_columns:
+        print("plotting figure " + str(figure_num));
+        # set figure and width/height
+        plt.figure(figure_num, figsize=(5, 5));
+        plt_title = patient_name;
+
+        if plot_col == 'Nan'
+            print(plot_col, 'missing')
+
+        if "Standard" in patient_name:
+            patient_name = "Standard";
+            plt_title = plt_title + " " + plot_col;
+            plt.suptitle( plt_title, fontsize=14, fontweight='bold' );
+            plt.loglog( patient_data["Dilution"], patient_data[plot_col], color='k',
+                        marker='o', markerfacecolor='none',
+                        markersize=10,
+                        markeredgewidth=2, label="N/A" );
+
 # standard_id = df_plate.groupby("Standard")
 # for standard_name, standard_data in standard_id:
 #     # making sure patient name is a string
@@ -119,37 +133,37 @@ visit_color = {"V1": "r", "V2": "b", "V3": "g"};
 #         plt.figure( figure_num, figsize=(5, 5) );
 #         plt_title = "Standard"
 
-    # else:
-    #     # create title and assign it
-    #     plt_title = plt_title + " (" + patient_data["Gender"].iloc[0] + " " + str(
-    #     "%.f" % patient_data["Age"].iloc[0]) + " yr " + patient_data[
-    #                             "Hospital"].iloc[0] + ") " + plot_col;
-    #     plt.suptitle(plt_title, fontsize=14, fontweight='bold')
-    #     # plot each visit
-    #     visits = patient_data.groupby("Visit");
-    #     for visit_name, visit_data in visits:
-    #         if visit_name == "None":
-    #             visit_name = "V1";
-    #             # plotting with log axis, colors according to the visit_color dictionary
-    #             plt.loglog(visit_data["Dilution"], visit_data[plot_col], color=visit_color[visit_name.upper()],
-    #                            marker='o', markerfacecolor='none',
-    #                            markersize=10,
-    #                            markeredgewidth=2, label=visit_name[1]);
-    #         # assigning other misc plot axis and legend information
-    #         plt.xlabel('Dilution', fontsize=14);
-    #         plt.ylabel('Intensity', fontsize=14);
-    #         plt.legend(title="Visit", loc=1);
-    #         # save plot in the correct directory
-    #         fig_png_name = "Plate " + str(2) + "/" + plt_title + ".png";
-    #         plt.savefig(fig_png_name);
-    #         print("saved figure [" + plt_title + "]");
-    #         plt.close();
-    #         # add figure to html page
-    #         html_message += "<td><img src=\""+fig_png_name+"\" width=\"120\"></td>";
-    #         if (figure_num in [3,9,17,25,29,39]):
-    #             html_message += "</tr>\n<tr>"
-    #         elif figure_num == 48:
-    #             html_message += "</tr>\n</table>"
-    #         figure_num += 1;
-    #     fh.write(html_message);
-    #     fh.close();
+        else:
+            # create title and assign it
+            plt_title = plt_title + " (" + patient_data["Gender"].iloc[0] + " " + str(
+            "%.f" % patient_data["Age"].iloc[0]) + " yr " + patient_data[
+                                "Hospital"].iloc[0] + ") " + plot_col;
+            plt.suptitle(plt_title, fontsize=14, fontweight='bold')
+            # plot each visit
+            visits = patient_data.groupby("Visit");
+            for visit_name, visit_data in visits:
+                if visit_name == "None":
+                    visit_name = "V1";
+                # plotting with log axis, colors according to the visit_color dictionary
+                    plt.loglog(visit_data["Dilution"], visit_data[plot_col], color=visit_color[visit_name.upper()],
+                               marker='o', markerfacecolor='none',
+                               markersize=10,
+                               markeredgewidth=2, label=visit_name[1]);
+            # assigning other misc plot axis and legend information
+                plt.xlabel('Dilution', fontsize=14);
+                plt.ylabel('Intensity', fontsize=14);
+                plt.legend(title="Visit", loc=1);
+            # save plot in the correct directory
+                fig_png_name = "Plate " + str(2) + "/" + plt_title + ".png";
+                plt.savefig(fig_png_name);
+                print("saved figure [" + plt_title + "]");
+                plt.close();
+            # add figure to html page
+                html_message += "<td><img src=\""+fig_png_name+"\" width=\"120\"></td>";
+                if (figure_num in [3,9,17,25,29,39]):
+                    html_message += "</tr>\n<tr>"
+                elif figure_num == 48:
+                    html_message += "</tr>\n</table>"
+                    figure_num += 1;
+                    fh.write(html_message);
+                    fh.close();
