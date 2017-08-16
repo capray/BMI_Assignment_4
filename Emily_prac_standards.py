@@ -15,6 +15,8 @@ def clean_sample_id_column(df_plate):
     rex = re.compile(r'(?:(?P<Dilution> *[0]+1) *)?(?:(?P<Visit> *[1-3][v|V] *))?(?P<PatientID>[ |[A-Za-z0-9_]+)')
     outputs = [rex.match(x) for x in column1_array]
 
+
+
     # this takes the named groups from the regular expression above converts everything into a list of dictionaries where
     # the keys are group names (PatientID, Visit and Dilution) and the values are the corresponding string components
     lst_of_dcts = []
@@ -54,26 +56,22 @@ def clean_sample_id_column(df_plate):
     return df_plate;
 
 # import excel data file
-full_xls = pd.ExcelFile('06222016 Staph Array Data.xlsx');
-
-# loop through each sheet
-for sheet_num in range(2,11):
-    # grab corresponding sheet as a dataframe, skipping the first row as it contains meaningless data
-    df_plate_dirty = full_xls.parse(sheet_num, skiprows=1);
+full_xls = pd.ExcelFile('Plate2_standard_emily_test.xlsx');
+df_plate_dirty = full_xls.parse(sheet_num, skiprows=1);
 
     # run dataframe through function to clean up Sample ID column
-    df_plate = clean_sample_id_column(df_plate_dirty);
+df_plate = clean_sample_id_column(df_plate_dirty);
 
     # clean up column headers and reassign
-    df_plate.columns = map(lambda x: x.strip(), df_plate.columns);
+df_plate.columns = map(lambda x: x.strip(), df_plate.columns);
 
     # fill in the info for hospital, age, gender according to existing data
-    df_plate['Hospital'] = df_plate['Hospital'].ffill();
-    df_plate['Age'] = df_plate['Age'].ffill();
-    df_plate['Gender'] = df_plate['Gender'].ffill();
+df_plate['Hospital'] = df_plate['Hospital'].ffill();
+df_plate['Age'] = df_plate['Age'].ffill();
+df_plate['Gender'] = df_plate['Gender'].ffill();
 
     # name of columns that we will plot against dilution
-    plot_columns = ['surface protein ext', 'cytoplasmic ext', 'Exoprotein ext', 'LukE', 'LukD', 'LukS-PV', 'LukF-PV',
+plot_columns = ['surface protein ext', 'cytoplasmic ext', 'Exoprotein ext', 'LukE', 'LukD', 'LukS-PV', 'LukF-PV',
                     'LukAB(Lab)', 'LukAB(cc30)', 'Hemolysin gamma A', 'Hemolysin gamma B', 'Hemolysin gamma C', 'HLA-1',
                     'HLA -2', 'HLA', 'Betatoxin', 'PNAG', 'SEO', 'SP', 'SEG', 'SEI', 'SEU', 'SEN', 'SEM', 'SEB',
                     'PSMalpha2', 'PSMalpha3', 'psmalpah4', 'PSM 4variant', 'Pn CWPS', 'PC4', 'PC-12', 'PC16', 'Pn PS12',
@@ -81,46 +79,46 @@ for sheet_num in range(2,11):
                     'SpA domD5FcNull', 'hIgA', 'BSA', 'HSA', 'Rabbit IgG', 'ABA', 'LDL'];
 
     # visit number color coding dictionary
-    visit_color = {"V1": "r", "V2": "b", "V3": "g"};
+visit_color = {"V1": "r", "V2": "b", "V3": "g"};
 
     # group by patient id
-    patient_id = df_plate.groupby("PatientID");
-    for patient_name, patient_data in patient_id:
+patient_id = df_plate.groupby("PatientID");
+for patient_name, patient_data in patient_id:
         # making sure patient name is a string
-        patient_name = str(patient_name);
-        # create html file
-        fh = open("Plate " + str(sheet_num + 1) + "-" + patient_name + ".html", "w");
-        html_message = "<table>\n<tr>\n";
-        figure_num = 1;
-        # go through each data column to plot
-        for plot_col in plot_columns:
-            print("plotting figure " + str(figure_num));
-            # set figure and width/height
-            plt.figure(figure_num, figsize=(5, 5));
-            plt_title = patient_name;
+    patient_name = str(patient_name);
+    # create html file
+    fh = open("Plate " + str(sheet_num + 1) + "-" + patient_name + ".html", "w");
+    html_message = "<table>\n<tr>\n";
+    figure_num = 1;
+    # go through each data column to plot
+    for plot_col in plot_columns:
+        print("plotting figure " + str(figure_num));
+        # set figure and width/height
+        plt.figure(figure_num, figsize=(5, 5));
+        plt_title = patient_name;
 
             # if it is a "standard" patient, plot with no other info or visits
-            if "Standard" in patient_name:
-                patient_name = "Standard";
-                plt_title = plt_title + " " + plot_col;
-                plt.suptitle(plt_title, fontsize=14, fontweight='bold');
-                plt.loglog(patient_data["Dilution"], patient_data[plot_col], color='k',
+    if "Standard" in patient_name:
+        patient_name = "Standard";
+        plt_title = plt_title + " " + plot_col;
+        plt.suptitle(plt_title, fontsize=14, fontweight='bold');
+        plt.loglog(patient_data["Dilution"], patient_data[plot_col], color='k',
                            marker='o', markerfacecolor='none',
                            markersize=10,
                            markeredgewidth=2, label="N/A");
-            else:
-                # create title and assign it
-                plt_title = plt_title + " (" + patient_data["Gender"].iloc[0] + " " + str(
-                    "%.f" % patient_data["Age"].iloc[0]) + " yr " + patient_data[
+    else:
+        # create title and assign it
+        plt_title = plt_title + " (" + patient_data["Gender"].iloc[0] + " " + str(
+        "%.f" % patient_data["Age"].iloc[0]) + " yr " + patient_data[
                                 "Hospital"].iloc[0] + ") " + plot_col;
-                plt.suptitle(plt_title, fontsize=14, fontweight='bold')
-                # plot each visit
-                visits = patient_data.groupby("Visit");
-                for visit_name, visit_data in visits:
-                    if visit_name == "None":
-                        visit_name = "V1";
-                    # plotting with log axis, colors according to the visit_color dictionary
-                    plt.loglog(visit_data["Dilution"], visit_data[plot_col], color=visit_color[visit_name.upper()],
+        plt.suptitle(plt_title, fontsize=14, fontweight='bold')
+        # plot each visit
+        visits = patient_data.groupby("Visit");
+        for visit_name, visit_data in visits:
+            if visit_name == "None":
+                visit_name = "V1";
+                # plotting with log axis, colors according to the visit_color dictionary
+                plt.loglog(visit_data["Dilution"], visit_data[plot_col], color=visit_color[visit_name.upper()],
                                marker='o', markerfacecolor='none',
                                markersize=10,
                                markeredgewidth=2, label=visit_name[1]);
