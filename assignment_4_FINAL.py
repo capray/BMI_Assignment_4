@@ -183,8 +183,8 @@ for sheet_num in range(11):
                 html_message += "</tr>\n</table>"
             figure_num += 1
         # update index.html
-        html_name = "Plate " + str(sheet_num + 1) + "-" + patient_name + ".html"
-        index_html_message += "<a href=\"" + html_name + "\">"+html_name+"</a><br>"
+        html_name = "Plate " + str(sheet_num + 1) + "-" + patient_name
+        index_html_message += "<a href=\"" + html_name + ".html" + "\">"+html_name+"</a><br>"
         fh.write(html_message)
         fh.close()
 fh_index.write(index_html_message)
